@@ -113,7 +113,7 @@ class _OAuthClient(_Base):
     OAUTH_FILEPATH = utils.NotImplementedField
 
     @classmethod
-    def perform_oauth(cls, storage_filepath=_path_sentinel, open_browser=False):
+    def perform_oauth(cls, storage_filepath=_path_sentinel, open_browser=False, code=None):
         """Provides a series of prompts for a user to follow to authenticate.
         Returns ``oauth2client.client.OAuth2Credentials`` when successful.
 
@@ -145,19 +145,20 @@ class _OAuthClient(_Base):
 
         flow = OAuth2WebServerFlow(**cls._session_class.oauth._asdict())
 
-        auth_uri = flow.step1_get_authorize_url()
-        print()
-        print("Visit the following url:\n %s" % auth_uri)
-
-        if open_browser:
+        if not code:
+            auth_uri = flow.step1_get_authorize_url()
             print()
-            print('Opening your browser to it now...', end=' ')
-            webbrowser.open(auth_uri)
-            print('done.')
-            print("If you don't see your browser, you can just copy and paste the url.")
-            print()
+            print("Visit the following url:\n %s" % auth_uri)
 
-        code = input("Follow the prompts, then paste the auth code here and hit enter: ")
+            if open_browser:
+                print()
+                print('Opening your browser to it now...', end=' ')
+                webbrowser.open(auth_uri)
+                print('done.')
+                print("If you don't see your browser, you can just copy and paste the url.")
+                print()
+
+            code = input("Follow the prompts, then paste the auth code here and hit enter: ")
 
         credentials = flow.step2_exchange(code)
 
